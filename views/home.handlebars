@@ -1,35 +1,115 @@
 <main>
     <form class="form-inline">
       <div class="form-group mx-sm-3 mb-2">
-        <input type="text" class="form-control" id="dbInput" placeholder="Insert Database">
+        <input type="text" class="form-control" id="createDbInput" placeholder="Insert Database">
       </div>
       <button id="createDb" class="btn btn-primary mb-2">Create Database</button>
     </form>
 
     <form class="form-inline">
       <div class="form-group mx-sm-3 mb-2">
-        <input type="password" class="form-control" id="" placeholder="Insert Database">
+        <input type="text" class="form-control" id="deleteDbInput" placeholder="Database to Delete">
       </div>
-      <button class="btn btn-primary mb-2">Create Database</button>
+       <button id="deleteDb" class="btn btn-danger mb-2">Delete A Database</button>
     </form>
+
+    <form class="form-inline">
+      <div class="form-group mx-sm-3 mb-2">
+        <input type="text" class="form-control" id="c" placeholder="Insert Database">
+      </div>
+      <button class="btn btn-warning mb-2">Rename A Database</button>
+    </form>
+
+	<form class="form-inline">
+      <button id="listDb" class="btn btn-info mb-2">List Your Databases</button>
+    </form>
+	<div id="databases">
+		
+	</div>
 </main>
 
 <script type="text/javascript">
 
+	const databaseListDiv = document.querySelector('#databases');
+
+
+	// Callback functions
     const createDb = event => {
         event.preventDefault();
-        
+        const dbName = document.querySelector('#createDbInput').value;
+		// xhrRequest is a function that will 
+		xhrRequest('/makeDB', 'post', dbName);
     }
 
+	const deleteDb = event => {
+		event.preventDefault();
+		const dbName = document.querySelector('#deleteDbInput').value;
+		console.log(dbName);
+		xhrRequest('/deleteDB', 'post', dbName);
+	}
+
+	const listDbs = event => {
+		event.preventDefault();
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', '/listDBs', true);
+		xhr.onload = function() {
+			if (this.status >= 200 && this.status < 400) {
+				const databaseList = this.response;
+				JSON.parse(databaseList);
+				console.log(typeof databaseList);
+				const unorderedList = document.createElement('ul');
+				databaseList.forEach( database => {
+					let listItem = document.createElement('li');
+					listItem.textContent = database;
+					unorderedList.appendChild(listItem);
+				})
+				databaseListDiv.appendChild(unorderedList);
+			}
+		}
+		xhr.send();
+	}
+
+
+	// Event Listeners
     const createDbButton = document.querySelector('#createDb');
-    createDbButton.addEventListener('click', event => {
-        event.preventDefault();
-        const dbName = document.querySelector('#dbInput').value;
-        console.log(dbName)
-    });
+    createDbButton.addEventListener('click', (event) => {
+		createDb(event)
+	});
+
+	const deleteDbButton = document.querySelector('#deleteDb');
+	deleteDbButton.addEventListener('click', (event) => {
+		deleteDb(event);
+	});
+
+	const listDbButton = document.querySelector('#listDb');
+	listDbButton.addEventListener('click', (event) => {
+		listDbs(event);
+	})
 
 
 
+	// AJAX function commonly used in all of our callback functions
+	function xhrRequest(route, method, databaseName = null) {
+		// Error Check
+		if (route === undefined || method === undefined) {
+			console.log("You need to provide both a Route and Method");
+			return;
+		}
 
+		// Body to send to API
+		const body = {
+			databaseName
+		}
+		// Create XHR instance to communicate with server
+        const xhr = new XMLHttpRequest();
+        xhr.open(method.toUpperCase(), route, true);
+        xhr.onload = function() {
+			if (this.status >= 200 && this.status < 400) {
+				console.log(this.responseText);
+			}
+		}
+		xhr.setRequestHeader("Content-type", "application/json");
+		xhr.send(JSON.stringify(body));
+	}
 
 </script>

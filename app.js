@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const request = require('request');
 const exphbs  = require('express-handlebars');
+const bodyParser = require('body-parser');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 
@@ -13,14 +14,15 @@ const app = express();
 const port = 8080;
 
 
-const nano = require('nano')('http://root:jabberwocky@localhost:5984');
-nano.db.create('test');
-
 // Initiate Middleware
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 
 // Initial View Engine
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
@@ -31,7 +33,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Initiate Routes
 app.use(indexRouter);
-
 
 /*
     Admin: root
