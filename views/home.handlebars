@@ -1,0 +1,35 @@
+<main>
+    <form class="form-inline">
+      <div class="form-group mx-sm-3 mb-2">
+        <input type="text" class="form-control" id="dbInput" placeholder="Insert Database">
+      </div>
+      <button id="createDb" class="btn btn-primary mb-2">Create Database</button>
+    </form>
+
+    <form class="form-inline">
+      <div class="form-group mx-sm-3 mb-2">
+        <input type="password" class="form-control" id="" placeholder="Insert Database">
+      </div>
+      <button class="btn btn-primary mb-2">Create Database</button>
+    </form>
+</main>
+
+<script type="text/javascript">
+
+    const createDb = event => {
+        event.preventDefault();
+        
+    }
+
+    const createDbButton = document.querySelector('#createDb');
+    createDbButton.addEventListener('click', event => {
+        event.preventDefault();
+        const dbName = document.querySelector('#dbInput').value;
+        console.log(dbName)
+    });
+
+
+
+
+
+</script>
