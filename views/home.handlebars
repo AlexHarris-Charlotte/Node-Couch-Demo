@@ -1,28 +1,21 @@
-<main>
-    <form class="form-inline">
+<main class="container">
       <div class="form-group mx-sm-3 mb-2">
         <input type="text" class="form-control" id="createDbInput" placeholder="Insert Database">
+		<button id="createDb" class="btn btn-primary mb-2">Create Database</button>
       </div>
-      <button id="createDb" class="btn btn-primary mb-2">Create Database</button>
-    </form>
 
-    <form class="form-inline">
       <div class="form-group mx-sm-3 mb-2">
         <input type="text" class="form-control" id="deleteDbInput" placeholder="Database to Delete">
+		<button id="deleteDb" class="btn btn-danger mb-2">Delete A Database</button>
       </div>
-       <button id="deleteDb" class="btn btn-danger mb-2">Delete A Database</button>
-    </form>
 
-    <form class="form-inline">
-      <div class="form-group mx-sm-3 mb-2">
-        <input type="text" class="form-control" id="c" placeholder="Insert Database">
-      </div>
-      <button class="btn btn-warning mb-2">Rename A Database</button>
-    </form>
+      {{!-- <div class="form-group mx-sm-3 mb-2">
+        <input type="text" class="form-control" id="dbToRename" placeholder="Insert Database">
+        <input type="text" class="form-control" id="replacementName" placeholder="Insert Database">
+		<button id="renameDb" class="btn btn-warning mb-2">Rename A Database</button>
+      </div> --}}
 
-	<form class="form-inline">
       <button id="listDb" class="btn btn-info mb-2">List Your Databases</button>
-    </form>
 	<div id="databases">
 		
 	</div>
@@ -33,12 +26,15 @@
 	const databaseListDiv = document.querySelector('#databases');
 
 
-	// Callback functions
+	// Callback functions ==============================================================================
+
     const createDb = event => {
         event.preventDefault();
         const dbName = document.querySelector('#createDbInput').value;
-		// xhrRequest is a function that will 
-		xhrRequest('/makeDB', 'post', dbName);
+		if (dbName) {
+			// xhrRequest is a function that will 
+			xhrRequest('/makeDB', 'post', dbName);
+		}
     }
 
 	const deleteDb = event => {
@@ -48,15 +44,18 @@
 		xhrRequest('/deleteDB', 'post', dbName);
 	}
 
+	/*const renameDb = event => {
+		event.preventDefault();
+		const dbName = document.querySelector('#')
+	}*/
+
 	const listDbs = event => {
 		event.preventDefault();
 		const xhr = new XMLHttpRequest();
 		xhr.open('GET', '/listDBs', true);
 		xhr.onload = function() {
 			if (this.status >= 200 && this.status < 400) {
-				const databaseList = this.response;
-				JSON.parse(databaseList);
-				console.log(typeof databaseList);
+				const databaseList = JSON.parse(this.responseText);
 				const unorderedList = document.createElement('ul');
 				databaseList.forEach( database => {
 					let listItem = document.createElement('li');
@@ -70,7 +69,9 @@
 	}
 
 
-	// Event Listeners
+
+	// Event Listeners =============================================================================
+
     const createDbButton = document.querySelector('#createDb');
     createDbButton.addEventListener('click', (event) => {
 		createDb(event)
@@ -84,11 +85,18 @@
 	const listDbButton = document.querySelector('#listDb');
 	listDbButton.addEventListener('click', (event) => {
 		listDbs(event);
-	})
+	});
+
+	/* 
+	const renameDbButton = document.querySelector('#renameDb');
+	renameDbButton.addEventListener('click', somefunchere)
+	*/
 
 
 
-	// AJAX function commonly used in all of our callback functions
+
+	// AJAX function commonly used in all of our callback functions =========================================
+	
 	function xhrRequest(route, method, databaseName = null) {
 		// Error Check
 		if (route === undefined || method === undefined) {

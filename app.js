@@ -6,12 +6,22 @@ const logger = require('morgan');
 const request = require('request');
 const exphbs  = require('express-handlebars');
 const bodyParser = require('body-parser');
+const couchbase = require('couchbase');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 
 // Initialze app instance and port
 const app = express();
 const port = 8080;
+
+const cluster = new couchbase.Cluster('couchbase://192.168.1.48:8091');
+const bucket = cluster.openBucket('beer-sample');
+console.log(cluster.dsnObj);
+console.log(bucket);
+
+// const N1qlQuery = couchbase.N1qlQuery;
+
+
 
 
 // Initiate Middleware
@@ -32,12 +42,20 @@ app.set('view engine', 'handlebars');
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Initiate Routes
-app.use(indexRouter);
+// app.use(indexRouter);
 
-/*
-    Admin: root
-    PW: jabberwocky
-*/
+app.get('/', (req, res) => {
+    bucket.get('aass_brewery', (error, result) => {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log(result);
+        }
+    })
+    res.render('home');
+});
+
+
 
 
 app.listen(port, () => {
